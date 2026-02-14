@@ -32,7 +32,7 @@ const Login = () => {
     setLoading(true);
 
     const res = await fetch(
-      "https://sz02nvjz-3000.inc1.devtunnels.ms/api/auth/login",
+      "https://unsensational-unthickly-alonzo.ngrok-free.dev/api/auth/login",
       {
         method: "POST",
         headers: {

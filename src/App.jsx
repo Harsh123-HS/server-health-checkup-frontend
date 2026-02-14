@@ -4,6 +4,10 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AddServer from "./pages/Addserver";
 import AddSystem from "./pages/AddSystem";
+import ServiceDetails from "./pages/ServiceDetails";
+import ManageSystems from "./pages/ManageSystems";
+
+
 
 function App() {
   const token = localStorage.getItem("token");
@@ -40,6 +44,9 @@ function App() {
     </ProtectedRoute>
   }
 />
+<Route path="/service-details" element={<ServiceDetails />} />
+<Route path="/manage-systems" element={<ManageSystems />} />
+
 
     </Routes>
   );

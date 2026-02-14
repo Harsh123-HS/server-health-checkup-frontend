@@ -34,7 +34,7 @@ function AddSystem() {
     const token = localStorage.getItem("token"); // 🔐 get JWT token
 
     const response = await fetch(
-      "https://sz02nvjz-3000.inc1.devtunnels.ms/api/systems", // ✅ same backend as health/login
+      "https://unsensational-unthickly-alonzo.ngrok-free.dev/api/systems", // ✅ same backend as health/login
       {
         method: "POST",
         headers: {

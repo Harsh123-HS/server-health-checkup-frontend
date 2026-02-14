@@ -5,7 +5,7 @@ function AddServer() {
   const navigate = useNavigate();
 
   const BASE_URL =
-    "https://sz02nvjz-3000.inc1.devtunnels.ms";
+    "https://unsensational-unthickly-alonzo.ngrok-free.dev";
 
   const [formData, setFormData] = useState({
     serverName: "",
@@ -28,6 +28,7 @@ function AddServer() {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, // 🔐 important
+            "ngrok-skip-browser-warning": "true"
           },
         });
 
@@ -84,12 +85,13 @@ const handleSubmit = async (e) => {
     const token = localStorage.getItem("token");
 
     const response = await fetch(
-      "https://sz02nvjz-3000.inc1.devtunnels.ms/api/services", // 🔥 services endpoint (important)
+      "https://unsensational-unthickly-alonzo.ngrok-free.dev/api/services", // 🔥 services endpoint (important)
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`, // 🔐 required if protected
+           
         },
         body: JSON.stringify({
           system: formData.systemName,   // ✅ matches backend

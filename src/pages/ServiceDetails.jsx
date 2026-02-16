@@ -68,7 +68,7 @@ function ServiceDetails() {
 
         <div className="h-6 w-px bg-slate-700" />
 
-        <h1 className="text-2xl font-semibold tracking-wide">
+        <h1 className="md:text-2xl text-xl  items-center font-semibold tracking-wide">
           Service Health Monitor
         </h1>
       </div>
@@ -83,7 +83,7 @@ function ServiceDetails() {
 
           {/* ROW 2 → CPU FULL WIDTH */}
           {/* ROW 2 → CPU CARDS */}
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div className="grid grid-cols- md:grid-cols-3 gap-6 mb-8">
 
   <MiniCard
     label="CPU User"
@@ -187,7 +187,7 @@ const HeroStatus = ({ data }) => {
           </p>
 
           <h2
-            className={`text-4xl font-bold tracking-wide ${
+            className={`md:text-4xl text-3xl font-bold tracking-wide ${
               isHealthy
                 ? "text-emerald-400"
                 : "text-red-400"
@@ -196,7 +196,7 @@ const HeroStatus = ({ data }) => {
             {isHealthy ? "HEALTHY" : "UNHEALTHY"}
           </h2>
 
-          <p className="text-gray-400 mt-3 text-sm">
+          <p className="text-gray-400 md:mt-3 mt-1  text-sm">
             {data.message || "Monitoring service health in real-time"}
           </p>
         </div>
@@ -228,17 +228,17 @@ const Metric = ({ label, value }) => (
 );
 
 const MiniCard = ({ label, value, label2, value2 }) => (
-  <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5">
+  <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl md:p-5 px-4 py-2 ">
     <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">
       {label}
     </p>
-    <p className="text-2xl font-semibold">
+    <p className="md:text-2xl text-xl font-semibold">
       {value ?? "—"}
     </p>
-    <p className="text-xs mt-4 text-gray-400 mb-2 uppercase tracking-wide">
+    <p className="text-xs md:mt-4 mt-2  text-gray-400 mb-2 uppercase tracking-wide">
       {label2}
     </p>
-    <p className="text-2xl font-semibold">
+    <p className="md:text-2xl text-xl font-semibold">
       {value2 ?? "—"}
     </p>
   </div>

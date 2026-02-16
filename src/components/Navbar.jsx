@@ -53,7 +53,7 @@ function Navbar({ onSearch }) {
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
-              `font-medium transition ${
+              `font-medium transition hidden md:flex ${
                 isActive
                   ? "text-cyan-400 border-b-2 border-cyan-400 pb-1"
                   : "text-gray-300 hover:text-white"

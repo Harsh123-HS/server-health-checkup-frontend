@@ -132,7 +132,7 @@ const fetchSystems = async () => {
   return (
   <div className="md:w-full bg-gradient-to-b from-[#0b1225] via-[#0f172a] to-[#020617] text-white border-b border-slate-800">
     
-    <div className="max-w-7xl md:mx-auto md:px-6 md:py-5 px-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+    <div className="md:max-w-7xl md:mx-auto md:px-6 md:py-5 px-4 mb-4 items-center  flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
       
       {/* 🔹 Left Content (Title Section) */}
       <div>

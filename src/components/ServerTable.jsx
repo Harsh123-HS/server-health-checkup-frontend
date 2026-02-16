@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { SiReact } from "react-icons/si";
+import { FiRefreshCw } from "react-icons/fi";
 import {
   FiChevronDown,
   FiChevronRight,
   FiServer,
   FiLink,
-} from "react-icons/fi";
+} from "react-icons/fi";  
 
 import { useNavigate } from "react-router-dom";
 
@@ -77,7 +77,6 @@ function ServerTable({ searchTerm = "" }) {
       );
 
       const json = await res.json();
-      console.log("New checkedAt:", json.systems?.[0]?.services?.[0]?.checkedAt);
       setData(json);
 
       // Default all systems expanded
@@ -151,18 +150,18 @@ function ServerTable({ searchTerm = "" }) {
   return (
     <div className="bg-[#020617] border border-slate-800 rounded-2xl shadow-2xl mt-6 overflow-hidden">
       {/* Table Header */}
-      <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+      <div className="md:px-6 px-4 py-4 border-b border-slate-800 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white tracking-wide">
           System Health Overview
         </h2>
-        <div className="text-xs text-gray-500 flex gap-2 items-center">
+        <div className="text-xs text-gray-500 flex gap-2  items-center">
           <button
             onClick={handleGlobalRefresh}
             className="px-6 py-2.5 rounded-xl bg-gradient-to-r 
             from-emerald-500 to-green-600 hover:from-emerald-700 hover:to-green-700 
             transition font-medium shadow-lg shadow-emerald-900/30 text-white cursor-pointer"
           >
-            Refresh
+            <FiRefreshCw size={16} />
           </button>
 
           <span className="text-xs text-gray-400">
@@ -177,11 +176,11 @@ function ServerTable({ searchTerm = "" }) {
       <table className="w-full text-sm text-gray-300 ">
         <thead className="bg-[#020617] text-gray-400 uppercase text-xs border-b border-slate-800">
           <tr>
-            <th className="px-6 py-4 text-left w-[40%]">Service</th>
-            <th className="px-6 py-4 text-left w-[15%]">Status</th>
-            <th className="px-6 py-4 text-left w-[25%]">Last Checked</th>
-            <th className="px-6 py-4 text-left w-[10%]">Response Time</th>
-            <th className="px-6 py-4 text-right w-[10%]">Action</th>
+            <th className="md:px-6 px-4 py-4 text-left   md:w-[40%]">Service</th>
+            <th className="md:px-6 px-3  py-4 text-left md:w-[15%]">Status</th>
+            <th className="md:px-6 px-4  py-4 text-left hidden  md:table-cell w-[25%]">Last Checked</th>
+            <th className="md:px-6 px-4 py-4 text-left hidden md:table-cell  md:w-[10%]">Response Time</th>
+            <th className="md:px-6 px-3   py-4 md:text-right text-center md:w-[10%]">Action</th>
           </tr>
         </thead>
 
@@ -202,7 +201,7 @@ function ServerTable({ searchTerm = "" }) {
                 {/* 🔷 SYSTEM ROW (ALIGNED - NO COLSPAN BREAK) */}
                 <tr className="bg-[#020617] border-b border-slate-800">
                   {/* Service Column */}
-                  <td className="px-6 py-4 font-semibold text-cyan-400">
+                  <td className="md:px-6 px-2 py-1 whitespace-nowrap md:py-4 font-semibold text-cyan-400">
                     <div className="flex items-center gap-3">
                       {/* Chevron Toggle (Professional UX) */}
                       <button
@@ -221,25 +220,23 @@ function ServerTable({ searchTerm = "" }) {
 
                       <span className="uppercase tracking-wide">
                         {system.name}
-                      </span>
-
-                      <span className="text-xs text-gray-500 ml-2">
+                        <br />
+                         <span className="text-xs text-gray-500 whitespace-nowrap  md:table-cell">
                         (Up: {system.summary?.up} | Down: {system.summary?.down}
                         )
                       </span>
+                      </span>
+
+                     
                     </div>
                   </td>
 
                   {/* Empty columns to maintain alignment */}
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  
 
                   {/* Action Column */}
-                  <td className="px-6 py-4 text-right"></td>
                 </tr>
 
-                {/* 🔹 SERVICES ROWS (Perfectly aligned now) */}
                 {isExpanded &&
                   system.services?.map((service, srvIndex) => (
                     <tr
@@ -247,14 +244,14 @@ function ServerTable({ searchTerm = "" }) {
                       className="border-b border-slate-900 hover:bg-[#0f172a] transition"
                     >
                       {/* Service Name (Indented properly) */}
-                      <td className="px-14 py-4 text-gray-200 font-medium">
+                      <td className="md:px-14 px-4 md:py-4  py-2 text-gray-200 font-medium">
                         {service.name}
                       </td>
 
                       {/* Status */}
-                      <td className="px-6 py-4">
+                      <td className="md:px-6 px-3 py-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          className={`  px-3 py-1 rounded-full text-xs font-semibold ${
                             service.status === "up"
                               ? "bg-green-500/10 text-green-400 border border-green-500/20"
                               : "bg-red-500/10 text-red-400 border border-red-500/20"
@@ -265,12 +262,12 @@ function ServerTable({ searchTerm = "" }) {
                       </td>
 
                       {/* Last Checked */}
-                      <td className="px-6 py-4 text-gray-400 whitespace-nowrap">
+                      <td className="px-6 py-4 text-gray-400 whitespace-nowrap hidden md:table-cell">
                         {formatTime(service.checkedAt)}
                       </td>
 
                       {/* Response Time */}
-                      <td className="px-6 py-4 font-medium">
+                      <td className="px-6 py-4 font-medium hidden md:table-cell">
                         {service.responseTimeMs !== null
                           ? `${service.responseTimeMs} ms`
                           : "N/A"}

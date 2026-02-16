@@ -88,16 +88,20 @@ function ServiceDetails() {
   <MiniCard
     label="CPU User"
     value={data.system.cpu.user}
+     label2="CPU System"
+    value2={data.system.cpu.system}
   />
 
-  <MiniCard
-    label="CPU System"
-    value={data.system.cpu.system}
+  <MiniCard 
+        label="Free Memory" value={data.system.freeMemory} 
+        label2="Total Memory" value2={data.system.totalMemory} 
   />
 
   <MiniCard
     label="Load Average"
     value={data.system.loadAverage.join(", ")}
+    label2="Uptime"
+    value2={data.uptime}
   />
 
 </div>
@@ -117,8 +121,7 @@ function ServiceDetails() {
                 <Metric label="Heap Used" value={data.system.memory.heapUsed} />
                 <Metric label="Heap Total" value={data.system.memory.heapTotal} />
                 <Metric label="External" value={data.system.memory.external} />
-                <Metric label="Free Memory" value={data.system.freeMemory} />
-                <Metric label="Total Memory" value={data.system.totalMemory} />
+           
               </div>
             </div>
 
@@ -224,13 +227,19 @@ const Metric = ({ label, value }) => (
   </div>
 );
 
-const MiniCard = ({ label, value }) => (
-  <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6">
+const MiniCard = ({ label, value, label2, value2 }) => (
+  <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5">
     <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">
       {label}
     </p>
     <p className="text-2xl font-semibold">
       {value ?? "—"}
+    </p>
+    <p className="text-xs mt-4 text-gray-400 mb-2 uppercase tracking-wide">
+      {label2}
+    </p>
+    <p className="text-2xl font-semibold">
+      {value2 ?? "—"}
     </p>
   </div>
 );

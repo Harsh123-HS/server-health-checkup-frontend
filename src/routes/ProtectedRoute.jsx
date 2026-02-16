@@ -1,14 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
+  const [isAuth, setIsAuth] = useState(null);
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
 
-  // If logged in → show dashboard
+    if (!token) {
+      setIsAuth(false);
+      return;
+    }
+
+    // Optional: basic JWT expiry check
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const isExpired = payload.exp * 1000 < Date.now();
+
+      if (isExpired) {
+        localStorage.removeItem("token");
+        setIsAuth(false);
+      } else {
+        setIsAuth(true);
+      }
+    } catch {
+      setIsAuth(false);
+    }
+  }, []);
+
+  if (isAuth === null) return null; // loading state
+  if (!isAuth) return <Navigate to="/login" replace />;
+
   return children;
 };
 

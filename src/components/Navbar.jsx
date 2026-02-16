@@ -28,11 +28,11 @@ function Navbar({ onSearch }) {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         
         {/* 🔹 Left: Logo + Brand */}
-        <div className="flex items-center gap-3 ">
+        <div className="flex items-center gap-6 ">
           <img src="src/assets/whitelogo.png" alt="" className="w-28 h-9"/>
-          <h1 className="text-xl font-semibold text-white tracking-wide">
+          {/* <h1 className="text-2xl font-semibold text-white tracking-wide">
             ServerMonitor
-          </h1>
+          </h1> */}
         </div>
 
         {/* 🔹 Center: Search Bar */}

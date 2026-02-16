@@ -16,17 +16,49 @@ function ServerTable({ searchTerm = "" }) {
   const [expandedSystems, setExpandedSystems] = useState({});
   const [viewUrl, setViewUrl] = useState(null); // 🔹 Modal state
   const navigate = useNavigate();
+  const [timeLeft, setTimeLeft] = useState(30);
 
-  useEffect(() => {
-  fetchHealthData();
 
-  // 🔄 Auto refresh every 30 seconds (real monitoring)
-  const interval = setInterval(() => {
-    fetchHealthData();
-  }, 30000);
+  const refreshData = async () => {
+    setTimeLeft(30);
+  await fetchHealthData();
+};
 
-  return () => clearInterval(interval);
+  const handleGlobalRefresh = () => {
+  // 1️⃣ Refresh current page immediately
+  refreshData();
+
+  // 2️⃣ Notify other pages/components
+  localStorage.setItem("globalRefresh", Date.now().toString());
+};
+ useEffect(() => {
+  // Initial load
+  refreshData();
+
+  const handleStorageChange = (event) => {
+    if (event.key === "globalRefresh") {
+      refreshData();
+    }
+  };
+
+  window.addEventListener("storage", handleStorageChange);
+
+  const countdown = setInterval(() => {
+    setTimeLeft((prev) => {
+      if (prev === 0) {
+        refreshData(); // 🔥 guaranteed trigger at 0
+        return 30;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => {
+    clearInterval(countdown);
+    window.removeEventListener("storage", handleStorageChange);
+  };
 }, []);
+
 
 
   const fetchHealthData = async () => {
@@ -45,6 +77,7 @@ function ServerTable({ searchTerm = "" }) {
       );
 
       const json = await res.json();
+      console.log("New checkedAt:", json.systems?.[0]?.services?.[0]?.checkedAt);
       setData(json);
 
       // Default all systems expanded
@@ -69,21 +102,20 @@ function ServerTable({ searchTerm = "" }) {
   };
 
   const formatTime = (iso) => {
-  if (!iso) return "N/A";
+    if (!iso) return "N/A";
 
-  const date = new Date(iso);
+    const date = new Date(iso);
 
-  return date.toLocaleString("en-IN", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit", // 🔥 THIS IS THE KEY
-    hour12: true,
-  });
-};
-
+    return date.toLocaleString("en-IN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit", // 🔥 THIS IS THE KEY
+      hour12: true,
+    });
+  };
 
   // 🔥 SMART FILTER LOGIC
   const filteredSystems = data?.systems
@@ -123,7 +155,23 @@ function ServerTable({ searchTerm = "" }) {
         <h2 className="text-lg font-semibold text-white tracking-wide">
           System Health Overview
         </h2>
-        <span className="text-xs text-gray-500">Live Monitoring Table</span>
+        <div className="text-xs text-gray-500 flex gap-2 items-center">
+          <button
+            onClick={handleGlobalRefresh}
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r 
+            from-emerald-500 to-green-600 hover:from-emerald-700 hover:to-green-700 
+            transition font-medium shadow-lg shadow-emerald-900/30 text-white cursor-pointer"
+          >
+            Refresh
+          </button>
+
+          <span className="text-xs text-gray-400">
+    Auto refresh in: 
+    <span className="text-cyan-400 font-semibold ml-1">
+      {timeLeft}s
+    </span>
+  </span>
+        </div>
       </div>
 
       <table className="w-full text-sm text-gray-300 ">
@@ -188,9 +236,7 @@ function ServerTable({ searchTerm = "" }) {
                   <td></td>
 
                   {/* Action Column */}
-                  <td className="px-6 py-4 text-right">
-                    
-                  </td>
+                  <td className="px-6 py-4 text-right"></td>
                 </tr>
 
                 {/* 🔹 SERVICES ROWS (Perfectly aligned now) */}
@@ -232,17 +278,17 @@ function ServerTable({ searchTerm = "" }) {
 
                       {/* View Button with Icon */}
                       <td className="px-6 py-4 text-right">
-                       <button
-onClick={() =>
-  navigate(`/service-details?url=${encodeURIComponent(service.url)}`)
-}
-
-  className="px-3 py-1.5 text-xs rounded-lg 
+                        <button
+                          onClick={() =>
+                            navigate(
+                              `/service-details?url=${encodeURIComponent(service.url)}`,
+                            )
+                          }
+                          className="px-3 py-1.5 text-xs rounded-lg 
   bg-blue-600 hover:bg-blue-700 transition font-medium"
->
-  View
-</button>
-
+                        >
+                          View
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -251,8 +297,6 @@ onClick={() =>
           })}
         </tbody>
       </table>
-
-      
     </div>
   );
 }

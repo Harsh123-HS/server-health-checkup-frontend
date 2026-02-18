@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BaseUrl from "../BaseUrl";
+import bgImg from "../assets/bg.png"; // 👈 your image
 
 const Login = () => {
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ const Login = () => {
     setLoading(true);
 
     const res = await fetch(
-      "https://unsensational-unthickly-alonzo.ngrok-free.dev/api/auth/login",
+      `${BaseUrl}/api/auth/login`,
       {
         method: "POST",
         headers: {
@@ -81,71 +83,88 @@ localStorage.setItem("token", token);
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#020617] px-4">
-      <div className="w-full max-w-md bg-[#0f172a] border border-slate-700 rounded-2xl shadow-2xl p-8">
-        
-        {/* Title */}
-        <h2 className="text-2xl font-bold text-white text-center mb-2">
-          Central Health Dashboard
-        </h2>
-        <p className="text-gray-400 text-center mb-6">
-          Login to access monitoring panel
-        </p>
+  <div
+    className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden"
+    style={{
+      backgroundImage: `url(${bgImg})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+    }}
+  >
+    {/* 🔥 Dark Overlay for readability */}
+    <div className="absolute inset-0 bg-[#020617]/5 backdrop-blur-sm "></div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-4 text-red-400 bg-red-900/20 border border-red-800 p-2 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
+    {/* 🔷 Login Card */}
+    <div className="relative w-full max-w-md bg-[#0f172a]/80 border border-slate-700/60 
+    rounded-2xl shadow-2xl p-8 backdrop-blur-xl">
+      
+      {/* Title */}
+      <h2 className="text-2xl font-bold text-white text-center mb-2 tracking-wide">
+        Central Health Dashboard
+      </h2>
+      <p className="text-gray-400 text-center mb-6 text-sm">
+      Infrastructure Monitoring Panel
+      </p>
 
-        {/* Form */}
-        <form onSubmit={handleLogin} className="space-y-4">
-          {/* Email */}
-          <div>
-            <label className="block text-gray-300 text-sm mb-1">
-              Username
-            </label>
-            <input
-              type="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Username"
-              className="w-full px-4 py-2 rounded-lg bg-[#020617] border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+      {/* Error Message */}
+      {error && (
+        <div className="mb-4 text-red-400 bg-red-900/20 border border-red-800 p-2 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
 
-          {/* Password */}
-          <div>
-            <label className="block text-gray-300 text-sm mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter password"
-              className="w-full px-4 py-2 rounded-lg bg-[#020617] border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+      {/* Form */}
+      <form onSubmit={handleLogin} className="space-y-4">
+        {/* Username */}
+        <div>
+          <label className="block text-gray-300 text-sm mb-1">
+            Username
+          </label>
+          <input
+            type="text"   // ⚠️ fixed (was username)
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            placeholder="Enter username"
+            className="w-full px-4 py-2 rounded-lg bg-[#020617]/70 border border-slate-600 
+            text-white focus:outline-none focus:ring-2 focus:ring-blue-500 
+            focus:border-blue-500 transition"
+          />
+        </div>
 
-          {/* Login Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white font-semibold disabled:opacity-50"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
+        {/* Password */}
+        <div>
+          <label className="block text-gray-300 text-sm mb-1">
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter password"
+            className="w-full px-4 py-2 rounded-lg bg-[#020617]/70 border border-slate-600 
+            text-white focus:outline-none focus:ring-2 focus:ring-blue-500 
+            focus:border-blue-500 transition"
+          />
+        </div>
 
-        {/* Demo Credentials */}
-        
-      </div>
+        {/* Login Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-2.5 rounded-lg bg-gradient-to-r 
+          from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 
+          transition text-white font-semibold shadow-lg shadow-blue-900/30 
+          disabled:opacity-50"
+        >
+          {loading ? "Authenticating..." : "Login to Dashboard"}
+        </button>
+      </form>
     </div>
-  );
-};
+  </div>
+);
+}
 
 export default Login;

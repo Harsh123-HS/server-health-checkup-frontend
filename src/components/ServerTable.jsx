@@ -4,8 +4,9 @@ import {
   FiChevronDown,
   FiChevronRight,
   FiServer,
-  FiLink,
-} from "react-icons/fi";  
+} from "react-icons/fi";
+
+import BASE_URL from "../BaseUrl";
 
 import { useNavigate } from "react-router-dom";
 
@@ -18,63 +19,56 @@ function ServerTable({ searchTerm = "" }) {
   const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState(30);
 
-
   const refreshData = async () => {
     setTimeLeft(30);
-  await fetchHealthData();
-};
+    await fetchHealthData();
+  };
 
   const handleGlobalRefresh = () => {
-  // 1️⃣ Refresh current page immediately
-  refreshData();
+    refreshData();
 
-  // 2️⃣ Notify other pages/components
-  localStorage.setItem("globalRefresh", Date.now().toString());
-};
- useEffect(() => {
-  // Initial load
-  refreshData();
-
-  const handleStorageChange = (event) => {
-    if (event.key === "globalRefresh") {
-      refreshData();
-    }
+    // 2️⃣ Notify other pages/components
+    localStorage.setItem("globalRefresh", Date.now().toString());
   };
+  useEffect(() => {
+    // Initial load
+    refreshData();
 
-  window.addEventListener("storage", handleStorageChange);
-
-  const countdown = setInterval(() => {
-    setTimeLeft((prev) => {
-      if (prev === 0) {
-        refreshData(); // 🔥 guaranteed trigger at 0
-        return 30;
+    const handleStorageChange = (event) => {
+      if (event.key === "globalRefresh") {
+        refreshData();
       }
-      return prev - 1;
-    });
-  }, 1000);
+    };
 
-  return () => {
-    clearInterval(countdown);
-    window.removeEventListener("storage", handleStorageChange);
-  };
-}, []);
+    window.addEventListener("storage", handleStorageChange);
 
+    const countdown = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev === 0) {
+          refreshData(); // 🔥 guaranteed trigger at 0
+          return 30;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
+    return () => {
+      clearInterval(countdown);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   const fetchHealthData = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch(
-        "https://unsensational-unthickly-alonzo.ngrok-free.dev/api/health",
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
-          },
+      const res = await fetch(`${BASE_URL}/api/health`, {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true"
         },
-      );
+      });
 
       const json = await res.json();
       setData(json);
@@ -119,23 +113,33 @@ function ServerTable({ searchTerm = "" }) {
   // 🔥 SMART FILTER LOGIC
   const filteredSystems = data?.systems
     ?.map((system) => {
-      const filteredServices = system.services?.filter(
+      const services = system.services || []; // 🔥 safety fix
+
+      const filteredServices = services.filter(
         (service) =>
-          service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          system.name.toLowerCase().includes(searchTerm.toLowerCase()),
+          service.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          system.name?.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
+      // If searching → show system even if no services
       if (searchTerm) {
         if (
-          system.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          system.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           filteredServices.length > 0
         ) {
-          return { ...system, services: filteredServices };
+          return {
+            ...system,
+            services: filteredServices, // may be empty but system still visible
+          };
         }
         return null;
       }
 
-      return system;
+      // 🔥 ALWAYS return system (even if services = [])
+      return {
+        ...system,
+        services: services,
+      };
     })
     .filter(Boolean);
 
@@ -149,151 +153,191 @@ function ServerTable({ searchTerm = "" }) {
 
   return (
     <div className="bg-[#020617] border border-slate-800 rounded-2xl shadow-2xl mt-6 overflow-hidden">
-      {/* Table Header */}
-      <div className="md:px-6 px-4 py-4 border-b border-slate-800 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white tracking-wide">
+      {/* 🔷 Header (Responsive) */}
+      <div
+        className="px-4 sm:px-6 py-4 border-b border-slate-800 
+    flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+      >
+        <h2 className="text-base sm:text-lg font-semibold text-white tracking-wide">
           System Health Overview
         </h2>
-        <div className="text-xs text-gray-500 flex gap-2  items-center">
+
+        <div className="flex items-center justify-between sm:justify-end gap-3">
           <button
             onClick={handleGlobalRefresh}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r 
-            from-emerald-500 to-green-600 hover:from-emerald-700 hover:to-green-700 
-            transition font-medium shadow-lg shadow-emerald-900/30 text-white cursor-pointer"
+            className="flex items-center justify-center px-4 sm:px-6 py-2 
+          rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 
+          hover:from-emerald-700 hover:to-green-700 
+          transition font-medium shadow-lg shadow-emerald-900/30 text-white"
           >
             <FiRefreshCw size={16} />
           </button>
 
-          <span className="text-xs text-gray-400">
-    Auto refresh in: 
-    <span className="text-cyan-400 font-semibold ml-1">
-      {timeLeft}s
-    </span>
-  </span>
+          <span className="text-xs text-gray-400 whitespace-nowrap">
+            Auto refresh in:
+            <span className="text-cyan-400 font-semibold ml-1">
+              {timeLeft}s
+            </span>
+          </span>
         </div>
       </div>
 
-      <table className="w-full text-sm text-gray-300 ">
-        <thead className="bg-[#020617] text-gray-400 uppercase text-xs border-b border-slate-800">
-          <tr>
-            <th className="md:px-6 px-4 py-4 text-left   md:w-[40%]">Service</th>
-            <th className="md:px-6 px-3  py-4 text-left md:w-[15%]">Status</th>
-            <th className="md:px-6 px-4  py-4 text-left hidden  md:table-cell w-[25%]">Last Checked</th>
-            <th className="md:px-6 px-4 py-4 text-left hidden md:table-cell  md:w-[10%]">Response Time</th>
-            <th className="md:px-6 px-3   py-4 md:text-right text-center md:w-[10%]">Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {filteredSystems?.length === 0 && (
+      {/* 🔥 Scroll Container (Critical for Mobile) */}
+      <div className="w-full overflow-x-auto">
+        <table className="w-full text-sm text-gray-300">
+          {/* Table Head */}
+          <thead className="bg-[#020617] text-gray-400 uppercase text-xs border-b border-slate-800">
             <tr>
-              <td colSpan="5" className="text-center py-12 text-gray-500">
-                No systems or services found
-              </td>
+              {/* Give more space to service */}
+              <th className="px-4 sm:px-6 py-4 text-left w-[55%]">Service</th>
+
+              {/* Always visible */}
+              <th className="px-2 sm:px-6 py-4 text-left w-[20%]">Status</th>
+
+              {/* Hide on mobile */}
+              <th className="px-6 py-4 text-left hidden md:table-cell w-[15%]">
+                Last Checked
+              </th>
+
+              {/* Hide on mobile */}
+              <th className="px-6 py-4 text-left hidden md:table-cell w-[10%]">
+                Response Time
+              </th>
+
+              {/* ALWAYS keep visible on mobile */}
+              <th className="px-2 sm:px-6 py-4 text-center md:text-right w-[15%]">
+                Action
+              </th>
             </tr>
-          )}
+          </thead>
 
-          {filteredSystems?.map((system, sysIndex) => {
-            const isExpanded = expandedSystems[system.name];
+          <tbody>
+            {filteredSystems?.length === 0 && (
+              <tr>
+                <td colSpan="5" className="text-center py-10 text-gray-500">
+                  No systems or services found
+                </td>
+              </tr>
+            )}
 
-            return (
-              <React.Fragment key={sysIndex}>
-                {/* 🔷 SYSTEM ROW (ALIGNED - NO COLSPAN BREAK) */}
-                <tr className="bg-[#020617] border-b border-slate-800">
-                  {/* Service Column */}
-                  <td className="md:px-6 px-2 py-1 whitespace-nowrap md:py-4 font-semibold text-cyan-400">
-                    <div className="flex items-center gap-3">
-                      {/* Chevron Toggle (Professional UX) */}
-                      <button
-                        onClick={() => toggleSystem(system.name)}
-                        className="text-cyan-400 hover:text-white transition"
-                      >
-                        {isExpanded ? (
-                          <FiChevronDown size={18} />
-                        ) : (
-                          <FiChevronRight size={18} />
-                        )}
-                      </button>
+            {filteredSystems?.map((system, sysIndex) => {
+              const isExpanded = expandedSystems[system.name];
 
-                      {/* System Icon (Better than React logo) */}
-                      <FiServer className="text-cyan-400" size={18} />
-
-                      <span className="uppercase tracking-wide">
-                        {system.name}
-                        <br />
-                         <span className="text-xs text-gray-500 whitespace-nowrap  md:table-cell">
-                        (Up: {system.summary?.up} | Down: {system.summary?.down}
-                        )
-                      </span>
-                      </span>
-
-                     
-                    </div>
-                  </td>
-
-                  {/* Empty columns to maintain alignment */}
-                  
-
-                  {/* Action Column */}
-                </tr>
-
-                {isExpanded &&
-                  system.services?.map((service, srvIndex) => (
-                    <tr
-                      key={srvIndex}
-                      className="border-b border-slate-900 hover:bg-[#0f172a] transition"
-                    >
-                      {/* Service Name (Indented properly) */}
-                      <td className="md:px-14 px-4 md:py-4  py-2 text-gray-200 font-medium">
-                        {service.name}
-                      </td>
-
-                      {/* Status */}
-                      <td className="md:px-6 px-3 py-4">
-                        <span
-                          className={`  px-3 py-1 rounded-full text-xs font-semibold ${
-                            service.status === "up"
-                              ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                              : "bg-red-500/10 text-red-400 border border-red-500/20"
-                          }`}
-                        >
-                          {service.status.toUpperCase()}
-                        </span>
-                      </td>
-
-                      {/* Last Checked */}
-                      <td className="px-6 py-4 text-gray-400 whitespace-nowrap hidden md:table-cell">
-                        {formatTime(service.checkedAt)}
-                      </td>
-
-                      {/* Response Time */}
-                      <td className="px-6 py-4 font-medium hidden md:table-cell">
-                        {service.responseTimeMs !== null
-                          ? `${service.responseTimeMs} ms`
-                          : "N/A"}
-                      </td>
-
-                      {/* View Button with Icon */}
-                      <td className="px-6 py-4 text-right">
+              return (
+                <React.Fragment key={system.name}>
+                  {/* 🔷 SYSTEM ROW */}
+                  <tr className="bg-[#020617] border-b border-slate-800">
+                    {/* Service Column */}
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-cyan-400">
+                      <div className="flex items-start sm:items-center gap-2 sm:gap-3">
                         <button
-                          onClick={() =>
-                            navigate(
-                              `/service-details?url=${encodeURIComponent(service.url)}`,
-                            )
-                          }
-                          className="px-3 py-1.5 text-xs rounded-lg 
-  bg-blue-600 hover:bg-blue-700 transition font-medium"
+                          onClick={() => toggleSystem(system.name)}
+                          className="text-cyan-400 hover:text-white transition mt-1 sm:mt-0"
                         >
-                          View
+                          {isExpanded ? (
+                            <FiChevronDown size={18} />
+                          ) : (
+                            <FiChevronRight size={18} />
+                          )}
                         </button>
-                      </td>
-                    </tr>
-                  ))}
-              </React.Fragment>
-            );
-          })}
-        </tbody>
-      </table>
+
+                        <FiServer
+                          className="text-cyan-400 shrink-0"
+                          size={18}
+                        />
+
+                        <div className="flex flex-col">
+                          <span className="uppercase tracking-wide text-sm sm:text-base break-words">
+                            {system.name}
+                          </span>
+                          <span className="text-[11px] sm:text-xs text-gray-500">
+                            (Up: {system.summary?.up} | Down:{" "}
+                            {system.summary?.down})
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Empty columns to preserve layout */}
+                    <td></td>
+                    <td className="hidden md:table-cell"></td>
+                    <td className="hidden md:table-cell"></td>
+                    <td></td>
+                  </tr>
+
+                  {/* 🔷 SERVICES */}
+                  {/* 🔷 SERVICES */}
+                  {isExpanded &&
+                    system.services?.length > 0 &&
+                    system.services.map((service, srvIndex) => (
+                      <tr
+                        key={service.url || `${system.name}-${srvIndex}`}
+                        className="border-b border-slate-900 hover:bg-[#0f172a] transition"
+                      >
+                        {/* Service Name */}
+                        <td className="px-3 sm:px-14 py-2 sm:py-4 text-gray-200 font-medium text-sm break-words">
+                          {service.name}
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-3 sm:px-6 py-2 sm:py-4">
+                          <span
+                            className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold whitespace-nowrap ${
+                              service.status === "up"
+                                ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                                : "bg-red-500/10 text-red-400 border border-red-500/20"
+                            }`}
+                          >
+                            {service.status.toUpperCase()}
+                          </span>
+                        </td>
+
+                        {/* Hidden on Mobile */}
+                        <td className="px-6 py-4 text-gray-400 whitespace-nowrap hidden md:table-cell">
+                          {formatTime(service.checkedAt)}
+                        </td>
+
+                        <td className="px-6 py-4 font-medium hidden md:table-cell">
+                          {service.responseTimeMs !== null
+                            ? `${service.responseTimeMs} ms`
+                            : "N/A"}
+                        </td>
+
+                        {/* View Button */}
+                        <td className="px-3 sm:px-6 py-2 sm:py-4 text-center md:text-right">
+                          <button
+                            onClick={() =>
+                              navigate("/service-details", {
+                                state: { url: service.url },
+                              })
+                            }
+                            className="px-3 py-1.5 text-[11px] sm:text-xs rounded-lg 
+          bg-blue-600 hover:bg-blue-700 transition font-medium whitespace-nowrap"
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+
+                  {/* 🔥 SHOW THIS IF NO SERVICES */}
+                  {isExpanded &&
+                    (!system.services || system.services.length === 0) && (
+                      <tr className="border-b border-slate-900">
+                        <td
+                          colSpan="5"
+                          className="px-6 py-4 text-gray-500 text-sm italic"
+                        >
+                          No servers/services added for this system
+                        </td>
+                      </tr>
+                    )}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Base_url from "../BaseUrl"
 import {
   FiTrash2,
   FiServer,
@@ -7,8 +8,7 @@ import {
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE =
-  "https://unsensational-unthickly-alonzo.ngrok-free.dev/api";
+
 
 function ManageSystems() {
   const navigate = useNavigate();
@@ -28,18 +28,18 @@ function ManageSystems() {
       const token = localStorage.getItem("token");
 
       const [systemsRes, servicesRes] = await Promise.all([
-        fetch(`${API_BASE}/systems`, {
+        fetch(`${Base_url}/api/systems`, {
           headers: {
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
+            "ngrok-skip-browser-warning": "true"
           },
         }),
-        fetch(`${API_BASE}/services`, {
+        fetch(`${Base_url}/api/services`, {
           headers: {
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true",
+            "ngrok-skip-browser-warning": "true"
           },
         }),
       ]);
@@ -97,11 +97,11 @@ function ManageSystems() {
       setDeleting(`system-${systemId}`);
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`${API_BASE}/systems/${systemId}`, {
+      const res = await fetch(`${Base_url}/api/systems/${systemId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
-          "ngrok-skip-browser-warning": "true",
+          
         },
       });
 
@@ -138,11 +138,11 @@ function ManageSystems() {
       setDeleting(`service-${serviceId}`);
       const token = localStorage.getItem("token");
 
-      const res = await fetch(`${API_BASE}/services/${serviceId}`, {
+      const res = await fetch(`${Base_url}/api/services/${serviceId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
-          "ngrok-skip-browser-warning": "true",
+      
         },
       });
 

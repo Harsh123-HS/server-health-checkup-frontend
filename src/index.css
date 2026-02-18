@@ -12,3 +12,12 @@
 .animate-spin-slow {
   animation: spin-slow 8s linear infinite;
 }
+
+
+body {
+  font-family: 'Sora', sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: 'Poppins', sans-serif;
+}

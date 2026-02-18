@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Baseurl from "../BaseUrl";
 
 function AddSystem() {
   const navigate = useNavigate();
@@ -34,12 +35,13 @@ function AddSystem() {
     const token = localStorage.getItem("token"); // 🔐 get JWT token
 
     const response = await fetch(
-      "https://unsensational-unthickly-alonzo.ngrok-free.dev/api/systems", // ✅ same backend as health/login
+      `${Baseurl}/api/systems`, // ✅ same backend as health/login
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`, // 🔥 IMPORTANT (if API is protected)
+          
         },
         body: JSON.stringify({
           name: formData.systemName,

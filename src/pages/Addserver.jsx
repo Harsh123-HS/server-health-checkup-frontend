@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import Baseurl from "../BaseUrl";
+
 function AddServer() {
   const navigate = useNavigate();
 
-  const BASE_URL =
-    "https://unsensational-unthickly-alonzo.ngrok-free.dev";
+  
 
   const [formData, setFormData] = useState({
     serverName: "",
@@ -24,7 +25,7 @@ function AddServer() {
       try {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${BASE_URL}/api/systems`, {
+        const res = await fetch(`${Baseurl}/api/systems`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, // 🔐 important
@@ -85,13 +86,13 @@ const handleSubmit = async (e) => {
     const token = localStorage.getItem("token");
 
     const response = await fetch(
-      "https://unsensational-unthickly-alonzo.ngrok-free.dev/api/services", // 🔥 services endpoint (important)
+      `${Baseurl}/api/services`, // 🔥 services endpoint (important)
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`, // 🔐 required if protected
-           
+           "ngrok-skip-browser-warning": "true"
         },
         body: JSON.stringify({
           system: formData.systemName,   // ✅ matches backend
@@ -170,7 +171,7 @@ const handleSubmit = async (e) => {
           {/* System Dropdown */}
           <div>
             <label className="block text-gray-300 text-sm mb-1">
-              System Name
+              System Name 
             </label>
             <select
               name="systemName"
